@@ -1,0 +1,8 @@
+{
+  "name": "Finova",
+  "description": "Intelligent personal finance with live stock simulation, personal budget management, and AI portfolio compounding.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

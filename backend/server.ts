@@ -1,7 +1,7 @@
 import express from "express";
 import path from "path";
 import crypto from "crypto";
-import { createServer as createViteServer } from "vite";
+import cors from "cors";
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
 import { sendOtpEmail } from "./server/emailService";
@@ -15,7 +15,20 @@ import {
 dotenv.config();
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 5000;
+
+// Enable CORS for frontend clients
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:5173",
+      "http://127.0.0.1:3000",
+      "http://127.0.0.1:5173",
+    ],
+    credentials: true,
+  })
+);
 
 app.use(express.json({ limit: "10mb" }));
 
@@ -66,7 +79,8 @@ async function callGeminiSafely(params: {
 app.get("/api/health", (_req, res) => {
   res.json({
     status: "ok",
-    app: "Finova",
+    app: "Finova Backend API",
+    port: PORT,
     hasApiKey: !!process.env.GEMINI_API_KEY,
   });
 });
@@ -543,15 +557,10 @@ app.post("/api/auth/reset-password", (req, res) => {
   }
 });
 
-async function startServer() {
-  if (process.env.NODE_ENV !== "production") {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: "spa",
-    });
-    app.use(vite.middlewares);
-  } else {
-    const distPath = path.join(process.cwd(), "dist");
+function startServer() {
+  // If dist exists and in production mode, optionally serve static frontend
+  if (process.env.NODE_ENV === "production") {
+    const distPath = path.join(__dirname, "../frontend/dist");
     app.use(express.static(distPath));
     app.get("*", (_req, res) => {
       res.sendFile(path.join(distPath, "index.html"));
@@ -559,7 +568,7 @@ async function startServer() {
   }
 
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Finova server running on http://localhost:${PORT}`);
+    console.log(`Finova Backend API running on http://localhost:${PORT}`);
   });
 }
 

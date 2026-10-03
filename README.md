@@ -1,20 +1,56 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# Finova — Intelligent Wealth & Stock Market OS
 
-# Run and deploy your AI Studio app
+Finova is structured into clean, decoupled **Frontend** and **Backend** directories.
 
-This contains everything you need to run your app locally.
+```
+finova---intelligent-wealth-&-stock-market-os/
+├── frontend/             # React 19 + TypeScript + Vite + Tailwind CSS SPA
+└── backend/              # Node.js + Express + TypeScript + Gemini AI API
+```
 
-View your app in AI Studio: https://ai.studio/apps/b23c4aab-5338-48dd-af82-cc260a41ea82
+---
 
-## Run Locally
+## 🚀 Quick Start
 
-**Prerequisites:**  Node.js
+### Option 1: Run via Root Workspaces (Recommended)
 
+1. **Install all dependencies** (for both frontend & backend):
+   ```bash
+   npm install
+   ```
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+2. **Configure your Backend `.env`**:
+   Copy `backend/.env.example` to `backend/.env` and insert your Gemini API Key:
+   ```bash
+   cp backend/.env.example backend/.env
+   ```
+
+3. **Start Backend**:
+   ```bash
+   npm run dev:backend
+   ```
+   *Runs Express on http://localhost:5000*
+
+4. **In a separate terminal, start Frontend**:
+   ```bash
+   npm run dev:frontend
+   ```
+   *Runs Vite on http://localhost:3000 (proxies `/api` to port 5000 automatically)*
+
+---
+
+### Option 2: Run Separately from Each Directory
+
+#### Running Frontend:
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+#### Running Backend:
+```bash
+cd backend
+npm install
+npm run dev
+```

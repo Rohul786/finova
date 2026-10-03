@@ -15,17 +15,12 @@ import {
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = Number(process.env.PORT) || 5000;
 
-// Enable CORS for frontend clients
+// Enable CORS for frontend clients (supports local dev, custom domains, and Vercel preview URLs)
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "http://localhost:5173",
-      "http://127.0.0.1:3000",
-      "http://127.0.0.1:5173",
-    ],
+    origin: true,
     credentials: true,
   })
 );
@@ -558,18 +553,28 @@ app.post("/api/auth/reset-password", (req, res) => {
 });
 
 function startServer() {
-  // If dist exists and in production mode, optionally serve static frontend
-  if (process.env.NODE_ENV === "production") {
-    const distPath = path.join(__dirname, "../frontend/dist");
-    app.use(express.static(distPath));
-    app.get("*", (_req, res) => {
-      res.sendFile(path.join(distPath, "index.html"));
-    });
+  // If dist exists and in standalone production mode (non-Vercel), optionally serve static frontend
+  if (process.env.NODE_ENV === "production" && !process.env.VERCEL) {
+    try {
+      const distPath = path.join(__dirname, "../frontend/dist");
+      app.use(express.static(distPath));
+      app.get("*", (_req, res) => {
+        res.sendFile(path.join(distPath, "index.html"));
+      });
+    } catch {
+      // Standalone mode without pre-built frontend dist
+    }
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Finova Backend API running on http://localhost:${PORT}`);
-  });
+  // Only bind port in standalone/local mode (Vercel serverless functions handle requests via exported app)
+  if (!process.env.VERCEL) {
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Finova Backend API running on http://localhost:${PORT}`);
+    });
+  }
 }
 
 startServer();
+
+export default app;
+export { app };
